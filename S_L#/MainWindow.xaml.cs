@@ -26,11 +26,49 @@ namespace S_L_
         public MainWindow()
         {
             this.InitializeComponent();
+
+            var fileFinder = new FileFinder();
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Paradox Interactive");
+            string filename = "launcher-v2.sqlite";
+            var files = fileFinder.FindFiles(path, filename);
+
+            // Получаем только названия папок
+            var folderNames = files.Keys.ToList();
+
+            // Добавляем названия папок в ListBox
+            foreach (var folder in folderNames)
+            {
+                FolderList.Items.Add(folder);
+            }
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        
+
+        private void FolderList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            myButton.Content = "Clicked";
+            // Ваш код здесь...
         }
     }
+
+    public class FileFinder
+    {
+        public Dictionary<string, List<string>> FindFiles(string path, string filename)
+        {
+            var result = new Dictionary<string, List<string>>();
+            foreach (var file in Directory.EnumerateFiles(path, filename, SearchOption.AllDirectories))
+            {
+                var directory = Path.GetDirectoryName(file);
+                if (result.ContainsKey(directory))
+                {
+                    result[directory].Add(file);
+                }
+                else
+                {
+                    result[directory] = new List<string> { file };
+                }
+            }
+            return result;
+        }
+    }
+
 }
